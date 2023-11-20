@@ -6,7 +6,7 @@
 /*   By: jeada-si <jeada-si@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/15 11:19:01 by jeada-si          #+#    #+#             */
-/*   Updated: 2023/11/15 11:43:06 by jeada-si         ###   ########.fr       */
+/*   Updated: 2023/11/17 12:04:49 by jeada-si         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,28 +47,23 @@ void	*ft_memmove(void *dest, const void *src, size_t n)
 	return (dest);
 }
 
-void	ft_bzero(void *s, size_t n)
+void	*ft_bzero(void *s, size_t n)
 {
 	while (n != 0)
 		((unsigned char *)s)[--n] = 0;
 	return (s);
 }
 
-void	*ft_calloc(size_t nmemb, size_t size)
+size_t	ft_strlcpy(char *dst, const char *src, size_t size)
 {
-	void	*out;
+	size_t	src_length;
 
-	if (nmemb == 0 || size == 0)
-	{
-		nmemb = 1;
-		size = 1;
-	}
-	if (nmemb > ((size_t)(-1)) / size)
-		return (NULL);
-	out = (void *)malloc(nmemb * size);
-	if (!out)
-		return (NULL);
-	ft_bzero(out, nmemb * size);
-	return (out);
+	src_length = ft_strlen(src);
+	if (!size)
+		return (src_length);
+	if (src_length + 1 <= size)
+		size = src_length + 1;
+	ft_memcpy(dst, src, size - 1);
+	dst[(int)size - 1] = '\0';
+	return (src_length);
 }
-
