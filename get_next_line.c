@@ -6,7 +6,7 @@
 /*   By: jeada-si <jeada-si@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/15 09:32:48 by jeada-si          #+#    #+#             */
-/*   Updated: 2023/11/20 14:35:14 by jeada-si         ###   ########.fr       */
+/*   Updated: 2023/11/20 15:22:48 by jeada-si         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,8 +60,8 @@ char	*read_line(t_buffer **buffer_list, int fd)
 	while (read_c)
 	{
 		read_c = read(fd, (buffer->content), BUFFER_SIZE);
-		if (!read_c)
-			return (NULL);			
+		if (read_c < 0)
+			return (NULL);		
 		buffer->content[read_c] = '\0';
 		if (cat_buffer(&line, buffer->content))
 			return (line);
