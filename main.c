@@ -6,7 +6,7 @@
 /*   By: jeada-si <jeada-si@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/15 09:51:33 by jeada-si          #+#    #+#             */
-/*   Updated: 2023/11/17 15:07:58 by jeada-si         ###   ########.fr       */
+/*   Updated: 2023/11/20 14:53:03 by jeada-si         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ int	main(int ac, char **av)
 {
 	int		fd;
 	char	*line;
+	int		i;
 
 	if (ac != 2)
 		return (0);
@@ -25,9 +26,18 @@ int	main(int ac, char **av)
 	{
 		write(2, "Something went wrong.\n", 22);
 	}
-	line = get_next_line(fd);
-	__builtin_printf("%s", line);
-	free(line);
+	i = 0;
+	while (i < 4)
+	{
+		__builtin_printf("Reading line %d\n", i++);
+		line = get_next_line(fd);
+		__builtin_printf("%s", line);
+		if (!line)
+		{
+			break;
+		}
+		free(line);
+	}	
 	close(fd);
 	return (1);
 }

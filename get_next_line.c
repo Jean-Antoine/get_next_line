@@ -6,59 +6,73 @@
 /*   By: jeada-si <jeada-si@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/15 09:32:48 by jeada-si          #+#    #+#             */
-/*   Updated: 2023/11/17 14:40:25 by jeada-si         ###   ########.fr       */
+/*   Updated: 2023/11/20 14:35:14 by jeada-si         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char *ft_trim_buffer(char *buf)
+t_buffer	*add_node(t_buffer **buffer_list, int fd)
 {
-	size_t	i;
+	t_buffer	*node;
 
-	i = 0;
-	while (buf[i] && buf[i] != '\n')
-		i++;
-	ft_memmove(buf, &buf[i + 1], ft_strlen(&buf[i + 1]));
-	ft_bzero(&buf[ft_strlen(buf)], i);
-	return (buf);
+	node = (t_buffer *)malloc(sizeof(t_buffer));
+	if (!node)
+		return (NULL);
+	node->content[0] = '\0';
+	node->fd = fd;
+	node->next = NULL;
+	node->file_ended = 0;
+	ft_lstadd_back(buffer_list, node);
+	return (node);
 }
 
-char	*ft_get_line(char *line, char *buf)
+t_buffer	*find_fd(t_buffer **buffer_list, int fd)
 {
-	char	*new_line;
-	int		endl;
-	size_t	i;
+	t_buffer	*node;
 
-	i = 0;
-	endl = 0;
-	while (buf[i] && buf[i] != '\n')
-		i++;
-	endl = buf[i] == '\n';
-	new_line = (char *)malloc((ft_strlen(*line) + i + endl + 1) * sizeof(char));
-	ft_strlcpy(new_line, *line, ft_strlen(*line) + 1);
-	ft_strlcpy(new_line, *buf, ft_strlen(*line) + i + 1);
-	free(*line);
-	return (new_line);
+	if (!buffer_list)
+		return (NULL);
+	node = *buffer_list;
+	while (node && node->fd != fd)
+		node = node->next;
+	if (!node)
+		node = add_node(buffer_list, fd);
+	return (node);
+}
+
+char	*read_line(t_buffer **buffer_list, int fd)
+{
+	t_buffer	*buffer;
+	char		*line;
+	ssize_t		read_c;
+
+	line = NULL;
+	buffer = find_fd(buffer_list, fd);
+	if (!buffer)
+		return (NULL);
+	if (buffer->file_ended)
+		return (NULL);
+	if (buffer->content[0])
+		if (cat_buffer(&line, buffer->content))
+			return (line);
+	read_c = 1;
+	while (read_c)
+	{
+		read_c = read(fd, (buffer->content), BUFFER_SIZE);
+		if (!read_c)
+			return (NULL);			
+		buffer->content[read_c] = '\0';
+		if (cat_buffer(&line, buffer->content))
+			return (line);
+	}
+	buffer->file_ended = 1;
+	return (line);
 }
 
 char	*get_next_line(int fd)
 {
-	static char	buf[BUFFER_SIZE + 1];
-	ssize_t		read_n;
-	char		*line;
+	static t_buffer	*buffer;
 
-	read_n = 1;
-	line = (char *)malloc(0);
-	while (read_n)
-	{
-		read_n = read(fd, buf, BUFFER_SIZE);
-		if (read_n < 0)
-			return (NULL);
-		buf[BUFFER_SIZE] = '\0';
-		line = ft_get_line(line, buf);
-		buf = ft_trim_buffer(buf);
-		
-	}
-	return (line);
+	return (read_line(&buffer, fd));
 }

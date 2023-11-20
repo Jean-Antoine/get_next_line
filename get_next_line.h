@@ -6,7 +6,7 @@
 /*   By: jeada-si <jeada-si@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/15 09:31:18 by jeada-si          #+#    #+#             */
-/*   Updated: 2023/11/17 12:06:12 by jeada-si         ###   ########.fr       */
+/*   Updated: 2023/11/20 14:08:48 by jeada-si         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,20 @@
 # include <unistd.h>
 # include <stdlib.h>
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 1024
+#  define BUFFER_SIZE 1
 # endif
 
-char	*get_next_line(int fd);
-size_t	ft_strlen(const char *s);
-void	*ft_bzero(void *s, size_t n);
-void	*ft_memcpy(void *dest, const void *src, size_t n);
-void	*ft_memmove(void *dest, const void *src, size_t n);
-size_t	ft_strlcpy(char *dst, const char *src, size_t size);
+typedef struct t_buffer
+{
+	int				fd;
+	char			content[BUFFER_SIZE + 1];
+	int				file_ended;
+	struct t_buffer	*next;
+}	t_buffer;
+void		ft_lstadd_back(t_buffer **lst, t_buffer *new);
+t_buffer	*ft_lstlast(t_buffer *lst);
+size_t		ft_strlen(const char *s);
+int			cat_buffer(char **line, char *buf);
+char		*get_next_line(int fd);
+
 #endif
