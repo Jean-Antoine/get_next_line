@@ -6,7 +6,7 @@
 /*   By: jeada-si <jeada-si@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/15 09:32:48 by jeada-si          #+#    #+#             */
-/*   Updated: 2023/11/21 10:00:24 by jeada-si         ###   ########.fr       */
+/*   Updated: 2023/11/21 10:23:56 by jeada-si         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ t_buffer	*add_node(t_buffer **buffer_list, int fd)
 	return (node);
 }
 
-t_buffer	**remove_node(t_buffer **buffer_list, int fd)
+t_buffer	*remove_node(t_buffer *buffer_list, int fd)
 {
 	t_buffer	*prev;
 	t_buffer	*current;
@@ -34,18 +34,18 @@ t_buffer	**remove_node(t_buffer **buffer_list, int fd)
 	if (!buffer_list)
 		return (NULL);
 	prev = NULL;
-	current = *buffer_list;
+	current = buffer_list;
 	while (current->next && current->fd != fd)
 	{
 		prev = current;
 		current = current->next;
 	}
-	if (current->fd == fd)
+	if (current->fd == fd && !current->content[0])
 	{
 		if (prev)
 			prev->next = current->next;
 		else
-			*buffer_list = current->next;
+			buffer_list = current->next;
 		free(current);
 	}
 	return (buffer_list);
@@ -82,21 +82,20 @@ char	*read_line(t_buffer **buffer_list, int fd)
 	{
 		read_c = read(fd, (buffer->content), BUFFER_SIZE);
 		if (read_c < 0)
-		{
-			buffer_list = remove_node(buffer_list, fd);
 			return (NULL);
-		}
 		buffer->content[read_c] = '\0';
 		if (read_c && cat_buffer(&line, buffer->content))
 			return (line);
 	}
-	buffer_list = remove_node(buffer_list, fd);
 	return (line);
 }
 
 char	*get_next_line(int fd)
 {
 	static t_buffer	*buffer;
+	char			*line;
 
-	return (read_line(&buffer, fd));
+	line = read_line(&buffer, fd);
+	buffer = remove_node(buffer, fd);
+	return (line);
 }
