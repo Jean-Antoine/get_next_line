@@ -6,79 +6,97 @@
 /*   By: jeada-si <jeada-si@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/15 11:19:01 by jeada-si          #+#    #+#             */
-/*   Updated: 2023/11/20 16:10:00 by jeada-si         ###   ########.fr       */
+/*   Updated: 2023/11/21 10:03:56 by jeada-si         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-void	ft_lstadd_back(t_buffer **lst, t_buffer *new)
+t_buffer	*add_node(t_buffer **buffer_list, int fd)
 {
-	t_buffer	*last;
+	t_buffer	*node;
 
-	if (!*lst)
-		*lst = new;
-	else
-	{
-		last = *lst;
-		while (last && last->next)
-			last = last->next;
-		last->next = new;
-	}
-}
-
-size_t	ft_strlen(const char *s)
-{
-	size_t	len;
-
-	if (!s)
-		return (0);
-	len = 0;
-	while (s[len])
-		len++;
-	return (len);
-}
-
-void	*ft_memcpy(void *dest, const void *src, size_t n)
-{
-	size_t	i;
-
-	i = -1;
-	if (!dest && !src)
+	node = (t_buffer *)malloc(sizeof(t_buffer));
+	if (!node)
 		return (NULL);
-	while (++i < n)
-		((unsigned char *)dest)[i] = ((unsigned char *)src)[i];
-	return (dest);
+	node->content[0] = '\0';
+	node->fd = fd;
+	node->next = NULL;
+	ft_lstadd_back(buffer_list, node);
+	return (node);
 }
 
-void	*ft_memset(void *s, int c, size_t n)
+t_buffer	**remove_node(t_buffer **buffer_list, int fd)
 {
-	while (n != 0)
-		((unsigned char *)s)[--n] = (unsigned char)c;
-	return (s);
+	t_buffer	*prev;
+	t_buffer	*current;
+
+	if (!buffer_list)
+		return (NULL);
+	prev = NULL;
+	current = *buffer_list;
+	while (current->next && current->fd != fd)
+	{
+		prev = current;
+		current = current->next;
+	}
+	if (current->fd == fd)
+	{
+		if (prev)
+			prev->next = current->next;
+		else
+			*buffer_list = current->next;
+		free(current);
+	}
+	return (buffer_list);
 }
 
-int	cat_buffer(char **line, char *buf)
+t_buffer	*find_fd(t_buffer **buffer_list, int fd)
 {
-	char	*new_line;
-	int		endl;
-	size_t	line_len;
-	size_t	i;
+	t_buffer	*node;
 
-	i = 0;
-	line_len = ft_strlen(*line);
-	while (buf[i] && buf[i] != '\n')
-		i++;
-	endl = buf[i] == '\n';
-	new_line = malloc(line_len + i + endl + 1);
-	if (!new_line)
-		return (0);
-	ft_memset(new_line, '\0', line_len + i + endl + 1);
-	ft_memcpy(new_line, *line, line_len);
-	ft_memcpy(new_line + line_len, buf, i + endl);
-	free(*line);
-	*line = new_line;
-	ft_memcpy(buf, &buf[i + endl], BUFFER_SIZE - i - endl + 1);
-	buf[BUFFER_SIZE - i - endl] = '\0';
-	return (endl);
+	if (!buffer_list)
+		return (NULL);
+	node = *buffer_list;
+	while (node && node->fd != fd)
+		node = node->next;
+	if (!node)
+		node = add_node(buffer_list, fd);
+	return (node);
+}
+
+char	*read_line(t_buffer **buffer_list, int fd)
+{
+	t_buffer	*buffer;
+	char		*line;
+	ssize_t		read_c;
+
+	line = NULL;
+	buffer = find_fd(buffer_list, fd);
+	if (!buffer)
+		return (NULL);
+	if (cat_buffer(&line, buffer->content))
+		return (line);
+	read_c = 1;
+	while (read_c)
+	{
+		read_c = read(fd, (buffer->content), BUFFER_SIZE);
+		if (read_c < 0)
+		{
+			buffer_list = remove_node(buffer_list, fd);
+			return (NULL);
+		}
+		buffer->content[read_c] = '\0';
+		if (read_c && cat_buffer(&line, buffer->content))
+			return (line);
+	}
+	buffer_list = remove_node(buffer_list, fd);
+	return (line);
+}
+
+char	*get_next_line(int fd)
+{
+	static t_buffer	*buffer;
+
+	return (read_line(&buffer, fd));
 }
