@@ -6,7 +6,7 @@
 /*   By: jeada-si <jeada-si@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/15 09:32:48 by jeada-si          #+#    #+#             */
-/*   Updated: 2023/11/21 09:53:20 by jeada-si         ###   ########.fr       */
+/*   Updated: 2023/11/21 10:00:24 by jeada-si         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@ t_buffer	*add_node(t_buffer **buffer_list, int fd)
 	node->content[0] = '\0';
 	node->fd = fd;
 	node->next = NULL;
-	node->file_ended = 0;
 	ft_lstadd_back(buffer_list, node);
 	return (node);
 }
