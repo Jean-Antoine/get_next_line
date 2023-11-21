@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*   get_next_line_utils_bonus.c                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jeada-si <jeada-si@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/15 11:19:01 by jeada-si          #+#    #+#             */
-/*   Updated: 2023/11/20 16:10:00 by jeada-si         ###   ########.fr       */
+/*   Updated: 2023/11/21 09:53:29 by jeada-si         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 void	ft_lstadd_back(t_buffer **lst, t_buffer *new)
 {
@@ -65,6 +65,8 @@ int	cat_buffer(char **line, char *buf)
 	size_t	line_len;
 	size_t	i;
 
+	if (!buf[0])
+		return (0);
 	i = 0;
 	line_len = ft_strlen(*line);
 	while (buf[i] && buf[i] != '\n')

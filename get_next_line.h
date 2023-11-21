@@ -6,7 +6,7 @@
 /*   By: jeada-si <jeada-si@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/15 09:31:18 by jeada-si          #+#    #+#             */
-/*   Updated: 2023/11/20 16:01:48 by jeada-si         ###   ########.fr       */
+/*   Updated: 2023/11/21 09:56:20 by jeada-si         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@ typedef struct t_buffer
 {
 	int				fd;
 	char			content[BUFFER_SIZE + 1];
-	int				file_ended;
 	struct t_buffer	*next;
 }	t_buffer;
 void		ft_lstadd_back(t_buffer **lst, t_buffer *new);
