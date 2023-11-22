@@ -6,7 +6,7 @@
 /*   By: jeada-si <jeada-si@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/15 09:32:48 by jeada-si          #+#    #+#             */
-/*   Updated: 2023/11/21 10:23:56 by jeada-si         ###   ########.fr       */
+/*   Updated: 2023/11/22 15:13:31 by jeada-si         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ t_buffer	*add_node(t_buffer **buffer_list, int fd)
 	return (node);
 }
 
-t_buffer	*remove_node(t_buffer *buffer_list, int fd)
+t_buffer	*remove_node(t_buffer *buffer_list, int fd, int force)
 {
 	t_buffer	*prev;
 	t_buffer	*current;
@@ -40,7 +40,7 @@ t_buffer	*remove_node(t_buffer *buffer_list, int fd)
 		prev = current;
 		current = current->next;
 	}
-	if (current->fd == fd && !current->content[0])
+	if (current->fd == fd && (!current->content[0] || force))
 	{
 		if (prev)
 			prev->next = current->next;
@@ -96,6 +96,6 @@ char	*get_next_line(int fd)
 	char			*line;
 
 	line = read_line(&buffer, fd);
-	buffer = remove_node(buffer, fd);
+	buffer = remove_node(buffer, fd, !line);
 	return (line);
 }
